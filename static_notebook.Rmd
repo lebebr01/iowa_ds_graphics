@@ -1,0 +1,380 @@
+---
+title: "Data Visualization - Static Graphics using R"
+author: "Brandon LeBeau"
+date: "June 5, 2018"
+output: html_notebook
+---
+
+# Course Setup
+```{r setup_chunks, echo = FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=6, fig.cap = NULL) 
+```
+
+```{r setup, message = FALSE, eval = FALSE}
+install.packages("tidyverse")
+```
+
+```{r library}
+library(tidyverse)
+```
+
+# Explore Data
+```{r data, echo = FALSE, results = 'asis'}
+midwest
+```
+
+# First ggplot
+```{r plot1}
+ggplot(data = midwest) +
+  geom_point(mapping = aes(x = popdensity, y = percollege))
+```
+
+# Equivalent Code
+```{r plot1_reduced}
+ggplot(midwest) +
+  geom_point(aes(x = popdensity, y = percollege))
+```
+
+# Your Turn
+1. Try plotting `popdensity` by `state`.
+2. Try plotting `county` by `state`. 
+    + Does this plot work?
+3. Bonus: Try just using the `ggplot(data = midwest)` from above. 
+    + What do you get? 
+    + Does this make sense?
+    
+# Add Aesthetics
+```{r aesthetic}
+ggplot(midwest) +
+  geom_point(aes(x = popdensity, y = percollege, color = state))
+```
+
+# Global Aesthetics
+```{r global_aes}
+ggplot(midwest) +
+  geom_point(aes(x = popdensity, y = percollege), color = 'pink')
+```
+
+# Your Turn
+1. Instead of using colors, make the shape of the points different for each state.
+2. Instead of color, use `alpha` instead. 
+    + What does this do to the plot?
+3. Try the following command: `colors()`. 
+    + Try a few colors to find your favorite.
+4. What happens if you use the following code:
+
+```{r glob_aes, fig.show = 'hide'}
+ggplot(midwest) + 
+  geom_point(aes(x = popdensity, y = percollege, color = 'green'))
+```
+
+
+# Additional Geoms
+```{r smooth, message = FALSE}
+ggplot(midwest) +
+  geom_smooth(aes(x = popdensity, y = percollege))
+```
+
+# Add more Aesthetics
+```{r smooth_states, message = FALSE}
+ggplot(midwest) +
+  geom_smooth(aes(x = popdensity, y = percollege, linetype = state), 
+              se = FALSE)
+```
+
+# Your Turn
+1. It is possible to combine geoms, which we will do next, but try it first. Try to recreate this plot.
+```{r combine, echo = FALSE, message = FALSE}
+ggplot(midwest) +
+  geom_point(aes(x = popdensity, y = percollege, color = state)) +
+  geom_smooth(aes(x = popdensity, y = percollege, color = state), 
+              se = FALSE)
+```
+
+
+# Layered ggplot
+```{r combine_geoms, message = FALSE}
+ggplot(midwest) +
+  geom_point(aes(x = popdensity, y = percollege, color = state)) +
+  geom_smooth(aes(x = popdensity, y = percollege, color = state), 
+              se = FALSE)
+```
+
+# Remove duplicate aesthetics
+```{r two_geoms, message = FALSE}
+ggplot(midwest, 
+       aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+```
+
+# Your Turn
+1. Can you recreate the following figure?
+```{r differ_aes, message = FALSE, echo = FALSE}
+ggplot(midwest, aes(x = popdensity, y = percollege)) +
+  geom_point(aes(color = state)) +
+  geom_smooth(se = FALSE)
+```
+
+
+# Brief plot customization
+```{r breaks_x, eval = FALSE}
+ggplot(midwest, 
+       aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() + 
+  scale_x_continuous("Population Density", 
+                     breaks = seq(0, 80000, 20000)) + 
+  scale_y_continuous("Percent College Graduates") + 
+  scale_color_discrete("State")
+```
+
+# Brief plot customization Output
+```{r breaks_x2, echo = FALSE}
+ggplot(midwest, 
+       aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() + 
+  scale_x_continuous("Population Density", 
+                     breaks = seq(0, 80000, 20000)) + 
+  scale_y_continuous("Percent College Graduates") + 
+  scale_color_discrete("State")
+```
+
+# Change plot theme
+```{r theme_bw, message = FALSE}
+ggplot(midwest, 
+       aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() +
+  geom_smooth(se = FALSE) + 
+  theme_bw()
+```
+
+# More themes
++ Themes in ggplot2: <http://ggplot2.tidyverse.org/reference/ggtheme.html>
++ Themes from ggthemes package: <https://cran.r-project.org/web/packages/ggthemes/vignettes/ggthemes.html>
+
+# Base plot for reference
+```{r base_plot}
+p1 <- ggplot(midwest, 
+       aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() + 
+  scale_x_continuous("Population Density", 
+                     breaks = seq(0, 80000, 20000)) + 
+  scale_y_continuous("Percent College Graduates") + 
+  theme_bw()
+```
+
+
+# Add plot title or subtitle
+```{r title_subtitle_ggplot2}
+p1 + 
+  labs(title = "Percent College Educated by Population Density",
+       subtitle = "County level data for five midwest states")
+```
+
+
+# Color Options
+```{r grey_color}
+p1 + scale_color_grey("State")
+```
+
+# Using colorbrewer2.org
++ <http://colorbrewer2.org>
+
+```{r color_brewer}
+p1 + scale_color_brewer("State", palette = 'Dark2')
+```
+
+# Two additional color options
++ viridis: <https://github.com/sjmgarnier/viridis>
++ scico: <https://github.com/thomasp85/scico>
+
+# viridis colors
+```{r viridis, message = FALSE}
+library(viridis)
+p1 + scale_color_viridis(discrete = TRUE)
+```
+
+# viridis colors
+```{r viridis2}
+p1 + scale_color_viridis(option = 'cividis', discrete = TRUE)
+```
+
+
+# Zoom in on a plot
+```{r zoom, eval = FALSE}
+ggplot(data = midwest, 
+       aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() + 
+  scale_x_continuous("Population Density") + 
+  scale_y_continuous("Percent College Graduates") + 
+  scale_color_discrete("State") + 
+  coord_cartesian(xlim = c(0, 15000))
+```
+
+# Zoom in on a plot output
+```{r zoom_out, echo = FALSE}
+ggplot(data = midwest, 
+       aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() + 
+  scale_x_continuous("Population Density") + 
+  scale_y_continuous("Percent College Graduates") + 
+  scale_color_discrete("State") + 
+  coord_cartesian(xlim = c(0, 15000))
+```
+
+# Zoom using `scale_x_continuous` - Bad Practice
+```{r zoom_x, eval = FALSE}
+ggplot(data = midwest, 
+       aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() + 
+  geom_smooth(se = FALSE) +
+  scale_x_continuous("Population Density", limits = c(0, 15000)) + 
+  scale_y_continuous("Percent College Graduates") + 
+  scale_color_discrete("State")
+```
+
+# Comparing output
+```{r zoom_x_output, echo = FALSE}
+library(patchwork)
+
+p1 <- ggplot(data = midwest, 
+             aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() + 
+  geom_smooth(se = FALSE) +
+  scale_x_continuous("Population Density", limits = c(0, 15000)) + 
+  scale_y_continuous("Percent College Graduates") + 
+  scale_color_discrete("State")
+
+p2 <- ggplot(data = midwest, 
+             aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() + 
+  geom_smooth(se = FALSE) +
+  scale_x_continuous("Population Density") + 
+  scale_y_continuous("Percent College Graduates") + 
+  scale_color_discrete("State") +
+  coord_cartesian(xlim = c(0, 15000))
+
+p1 + p2
+```
+
+
+# Lord of the Rings Data
+- Data from Jenny Bryan: <https://github.com/jennybc/lotr>
+
+```{r read_in_lotr, error = FALSE}
+lotr <- read_tsv('https://raw.githubusercontent.com/jennybc/lotr/master/lotr_clean.tsv')
+lotr
+```
+
+# Geoms for single variables
+```{r histogram}
+ggplot(lotr, aes(x = Words)) + 
+  geom_histogram() + 
+  theme_bw()
+```
+
+# Customize histogram
+```{r cust_hist}
+ggplot(lotr, aes(x = Words)) + 
+  geom_histogram(bins = 20) + 
+  theme_bw()
+```
+
+# Customize histogram 2
+```{r cust_hist2}
+ggplot(lotr, aes(x = Words)) + 
+  geom_histogram(binwidth = 25) + 
+  theme_bw()
+```
+
+# Histograms by other variables - likely not useful
+```{r hist_film}
+ggplot(lotr, aes(x = Words, color = Film)) + 
+  geom_histogram(binwidth = 25) + 
+  theme_bw()
+```
+
+# Histograms by other variables - one alternative
+```{r hist_film_alt}
+ggplot(lotr, aes(x = Words)) + 
+  geom_histogram(binwidth = 25) + 
+  theme_bw() + 
+  facet_wrap(~ Film)
+```
+
+# Your Turn
+1. With more than two groups, histograms are difficult to interpret due to overlap. Instead, use the `geom_density` to create a density plot for `Words` for each film.
+
+2. Using `geom_boxplot`, create boxplots with `Words` as the y variable and `Film` as the x variable. Bonus: facet this plot by the variable `Race`. Bonus2: Zoom in on the bulk of the data.
+
+
+# Rotation of axis labels
+```{r rotate}
+ggplot(lotr, aes(x = Film, y = Words)) + 
+  geom_boxplot() + 
+  facet_wrap(~ Race) + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+# Many times `coord_flip` is better
+```{r flip}
+ggplot(lotr, aes(x = Film, y = Words)) + 
+  geom_boxplot() + 
+  facet_wrap(~ Race) + 
+  theme_bw() + 
+  coord_flip()
+```
+
+# Bar graphs
+```{r simple_bar}
+ggplot(lotr, aes(x = Race)) + 
+  geom_bar() + 
+  theme_bw()
+```
+
+# Add aesthetic
+```{r bar_fill}
+ggplot(lotr, aes(x = Race)) +
+  geom_bar(aes(fill = Film)) + 
+  theme_bw()
+```
+
+# Stacked Bars Relative
+```{r stacked}
+ggplot(lotr, aes(x = Race)) + 
+  geom_bar(aes(fill = Film), position = 'fill') + 
+  theme_bw() + 
+  ylab("Proportion")
+```
+
+# Dodged Bars
+```{r}
+ggplot(lotr, aes(x = Race)) + 
+  geom_bar(aes(fill = Film), position = 'dodge') + 
+  theme_bw()
+```
+
+# Change Bar Col bar_coloror
+```{r bar_color}
+ggplot(lotr, aes(x = Race)) + 
+  geom_bar(aes(fill = Film), position = 'fill') + 
+  theme_bw() + 
+  ylab("Proportion") + 
+  scale_fill_viridis(option = 'cividis', discrete = TRUE)
+```
+
+
+# Your Turn
+1. Using the gss_cat data, create a bar chart of the variable `partyid`.
+2. Add the variable `marital` to the bar chart created in step 1. Do you prefer a stacked or dodged version?
+3. Take steps to make one of the plots above close to publication quality.
+
+
+# Additional ggplot2 resources
++ ggplot2 website: <http://docs.ggplot2.org/current/index.html>
++ ggplot2 book: <http://www.springer.com/us/book/9780387981413>
++ R graphics cookbook: <http://www.cookbook-r.com/Graphs/>
+
+# Additional R Resources
++ R for Data Science: <http://r4ds.had.co.nz/>

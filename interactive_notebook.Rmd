@@ -1,0 +1,237 @@
+---
+title: "Data Visualization - Interactive Graphics using R"
+author: "Brandon LeBeau"
+date: "June 5, 2018"
+output: html_notebook
+---
+
+```{r setup_chunks, echo = FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=6, fig.cap = NULL) 
+```
+
+# Interactive graphics with plotly
+```{r install, eval = FALSE}
+install.packages("plotly")
+```
+
+# First Interactive Plot
+```{r first_plotly, message = FALSE, fig.width = 9, fig.height = 6}
+library(plotly)
+library(tidyverse)
+p <- ggplot(data = midwest) +
+  geom_point(mapping = aes(x = popdensity, y = percollege))
+ggplotly(p)
+```
+
+# Customized Interactive Plot
+```{r custom_plotly, warning = FALSE, fig.width = 9, fig.height = 6}
+p <- ggplot(midwest, 
+       aes(x = popdensity, y = percollege, color = state)) +
+  geom_point() + 
+  scale_x_continuous("Population Density", 
+                     breaks = seq(0, 80000, 20000)) + 
+  scale_y_continuous("Percent College Graduates") + 
+  scale_color_discrete("State") + 
+  theme_bw()
+ggplotly(p)
+```
+
+# Your Turn
+1. Using the `starwars` data, create a static ggplot and use the `ggplotly` function to turn it interactive. 
+2. 
+
+# Lord of the Rings Data
+- Data from Jenny Bryan: <https://github.com/jennybc/lotr>
+
+```{r read_in_lotr, error = FALSE}
+lotr <- read_tsv('https://raw.githubusercontent.com/jennybc/lotr/master/lotr_clean.tsv')
+lotr
+```
+
+# Create plotly by hand
+```{r plotly_by_hand, fig.width = 9, fig.height = 6}
+plot_ly(lotr, x = ~Words) %>% add_histogram()
+```
+
+# Subplots
+```{r subplots, fig.width = 9, fig.height = 6}
+one_plot <- function(d) {
+  plot_ly(d, x = ~Words) %>%
+    add_histogram() %>%
+    add_annotations(
+      ~unique(Film), x = 0.5, y = 1, 
+      xref = "paper", yref = "paper", showarrow = FALSE
+    )
+}
+
+lotr %>%
+  split(.$Film) %>%
+  lapply(one_plot) %>% 
+  subplot(nrows = 1, shareX = TRUE, titleX = FALSE) %>%
+  hide_legend()
+```
+
+
+# Grouped bar plot
+```{r plotly_group, fig.width = 9, fig.height = 6}
+plot_ly(lotr, x = ~Race, color = ~Film) %>% add_histogram()
+```
+
+# Plot of proportions
+```{r plotly_proportions, message = FALSE, fig.width = 9, fig.height = 6}
+# number of diamonds by cut and clarity (n)
+lotr_count <- count(lotr, Race, Film)
+# number of diamonds by cut (nn)
+lotr_prop <- left_join(lotr_count, count(lotr_count, Race, wt = n))
+lotr_prop %>%
+  mutate(prop = n / nn) %>%
+  plot_ly(x = ~Race, y = ~prop, color = ~Film) %>%
+  add_bars() %>%
+  layout(barmode = "stack")
+```
+
+# Your Turn
+1. Using the `gss_cat` data, create a histrogram for the `tvhours` variable. 
+2. Using the `gss_cat` data, create a bar chart showing the `partyid` variable by the `marital` status.
+
+# Scatterplots by Hand
+```{r plotly_scatter, fig.width = 9, fig.height = 6, warning = FALSE}
+plot_ly(midwest, x = ~popdensity, y = ~percollege) %>%
+  add_markers()
+```
+
+# Change symbol
+```{r plotly_symbol, fig.width = 9, fig.height = 6}
+plot_ly(midwest, x = ~popdensity, y = ~percollege) %>%
+  add_markers(symbol = ~state)
+```
+
+# Change color
+```{r plotly_color, fig.height = 6, fig.width = 9}
+plot_ly(midwest, x = ~popdensity, y = ~percollege) %>%
+  add_markers(color = ~state, colors = viridis::viridis(5))
+```
+
+# Line Graph
+```{r plotly_line, fig.height = 6, fig.width = 9}
+storms_yearly <- storms %>%
+  group_by(year) %>%
+  summarise(num = length(unique(name)))
+
+plot_ly(storms_yearly, x = ~year, y = ~num) %>%
+  add_lines()
+```
+
+# Your Turn
+1. 
+2. 
+
+# Highcharter; Highcharts for R
+```{r install_highcharter, eval = FALSE}
+devtools::install_github("jbkunst/highcharter")
+```
+
+# `hchart` function
+```{r hchart1, fig.height = 6, fig.width = 9}
+library(highcharter)
+
+lotr_count <- lotr %>%
+  count(Film, Race)
+
+hchart(lotr_count, "column", hcaes(x = Race, y = n, group = Film))
+```
+
+# A second `hchart`
+```{r hchart2, fig.height = 6, fig.width = 9}
+hchart(midwest, "scatter", hcaes(x = popdensity, y = percollege, group = state))
+```
+
+# Histogram
+```{r hchart_hist, fig.height = 6, fig.width = 9}
+hchart(lotr$Words)
+```
+
+# Your Turn
+1. 
+2. 
+
+# Build Highcharts from scratch
+```{r hc_scratch, fig.width = 9, fig.height = 6}
+hc <- highchart() %>%
+  hc_xAxis(categories = lotr_count$Race) %>%
+  hc_add_series(name = 'The Fellowship Of The Ring', 
+                data = filter(lotr_count, Film == 'The Fellowship Of The Ring')$n) %>% 
+  hc_add_series(name = 'The Two Towers', 
+                data = filter(lotr_count, Film == 'The Two Towers')$n) %>%
+  hc_add_series(name = 'The Return Of The King', 
+                data = filter(lotr_count, Film == 'The Return Of The King')$n)
+hc
+```
+
+# Change Chart type
+```{r hc_chart, fig.width = 9, fig.height = 6}
+hc <- hc %>%
+  hc_chart(type = 'column')
+hc
+```
+
+# Change Colors
+```{r hc_change_colors, fig.width = 9, fig.height = 6}
+hc <- hc %>%
+  hc_colors(substr(viridis(3), 0, 7))
+hc
+```
+
+# Modify Axes
+```{r hc_axis, fig.height = 6, fig.width = 9}
+hc <- hc %>%
+  hc_xAxis(title = list(text = "Race")) %>%
+  hc_yAxis(title = list(text = "Number of Words Spoken"),
+           showLastLabel = FALSE)
+hc
+```
+
+# Add title, subtitle, move legend
+```{r hc_modify, fig.height = 6, fig.width = 9}
+hc <- hc %>%
+  hc_title(text = 'Number of Words Spoken in Lord of the Rings Films',
+           align = 'left') %>%
+  hc_subtitle(text = 'Broken down by <i>Film</i> and <b>Race</b>', 
+              align = 'left') %>%
+  hc_legend(align = 'right', verticalAlign = 'top', layout = 'vertical',
+            x = 0, y = 80) %>%
+  hc_exporting(enabled = TRUE)
+hc
+```
+
+
+# Your Turn
+1. 
+2. 
+
+# Correlation Matrices
+```{r correlation}
+select(storms, wind, pressure, ts_diameter, hu_diameter) %>%
+  cor(use = "pairwise.complete.obs") %>%
+  hchart()
+```
+
+# Leaflet Example
+```{r leaflet}
+library(leaflet)
+
+storms %>%
+  filter(name %in% c('Ike', 'Katrina'), year > 2000) %>%
+  leaflet() %>%
+  addTiles() %>%
+  addCircles(lng = ~long, lat = ~lat, popup = ~name, weight = 1,
+             radius = ~wind*1000)
+```
+
+
+# Additional Resources
+* plotly for R book: <https://plotly-book.cpsievert.me/>
+* plotly: <https://plot.ly/>
+* highcharter: <http://jkunst.com/highcharter/index.html>
+* highcharts: <https://www.highcharts.com/>
+* htmlwidgets: <https://www.htmlwidgets.org/>
