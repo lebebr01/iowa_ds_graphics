@@ -26,7 +26,7 @@ output:
         * pdfsearch
         * highlightHTML
         * SPSStoR
-- GitHub Repository for this workshop: <https://github.com/lebebr01/iowa_data_science>
+- GitHub Repository for this workshop: <https://github.com/lebebr01/iowa_ds_graphics>
 
 ## Why teach the tidyverse
 - The tidyverse is a series of packages developed by Hadley Wickham and his team at RStudio. <https://www.tidyverse.org/>
