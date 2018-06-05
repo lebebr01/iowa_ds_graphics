@@ -38,7 +38,6 @@ ggplotly(p)
 
 # Your Turn
 1. Using the `starwars` data, create a static ggplot and use the `ggplotly` function to turn it interactive. 
-2. 
 
 # Lord of the Rings Data
 - Data from Jenny Bryan: <https://github.com/jennybc/lotr>
@@ -123,8 +122,8 @@ plot_ly(storms_yearly, x = ~year, y = ~num) %>%
 ```
 
 # Your Turn
-1. 
-2. 
+1. Using the `gss_cat` data, create a scatterplot showing the `age` and `tvhours` variables.
+2. Compute the average time spent watching tv by year and marital status. Then, plot the average time spent watching tv by year and marital status.
 
 # Highcharter; Highcharts for R
 ```{r install_highcharter, eval = FALSE}
@@ -152,8 +151,8 @@ hchart(lotr$Words)
 ```
 
 # Your Turn
-1. 
-2. 
+1. Using the `hchart` function, create a bar chart or histogram with the `gss_cat` data.
+2. Using the `hchart` function, create a scatterplot with the `gss_cat` data.
 
 # Build Highcharts from scratch
 ```{r hc_scratch, fig.width = 9, fig.height = 6}
@@ -206,8 +205,7 @@ hc
 
 
 # Your Turn
-1. 
-2. 
+1. Build up a plot from scratch, getting the figure close to publication quality using the `gss_cat` data.
 
 # Correlation Matrices
 ```{r correlation}
