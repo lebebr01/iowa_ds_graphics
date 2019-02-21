@@ -1,7 +1,7 @@
 ---
 title: "Data Visualization - Static and Interactive Graphics using R"
 author: "Brandon LeBeau"
-date: "June 5, 2018"
+date: "February 21, 2019"
 output:
   revealjs::revealjs_presentation:
     theme: simple
@@ -486,10 +486,11 @@ plot_ly(lotr, x = ~Race, color = ~Film, width = 900) %>% add_histogram()
 ## number of diamonds by cut and clarity (n)
 lotr_count <- count(lotr, Race, Film)
 ## number of diamonds by cut (nn)
-lotr_prop <- left_join(lotr_count, count(lotr_count, Race, wt = n))
+lotr_prop <- left_join(lotr_count, count(lotr_count, Race, wt = n), 
+                       by = 'Race')
 
 plotly_out <-lotr_prop %>%
-  mutate(prop = n / nn) %>%
+  mutate(prop = n.x / n.y) %>%
   plot_ly(x = ~Race, y = ~prop, color = ~Film, width = 900) %>%
   add_bars() %>%
   layout(barmode = "stack")

@@ -1,7 +1,7 @@
 ---
 title: "Data Visualization - Interactive Graphics using R"
 author: "Brandon LeBeau"
-date: "June 5, 2018"
+date: "February 21, 2019"
 output: html_notebook
 ---
 
@@ -16,8 +16,8 @@ install.packages("plotly")
 
 # First Interactive Plot
 ```{r first_plotly, message = FALSE, fig.width = 9, fig.height = 6}
-library(plotly)
 library(tidyverse)
+library(plotly)
 p <- ggplot(data = midwest) +
   geom_point(mapping = aes(x = popdensity, y = percollege))
 ggplotly(p)
@@ -78,13 +78,15 @@ plot_ly(lotr, x = ~Race, color = ~Film) %>% add_histogram()
 
 # Plot of proportions
 ```{r plotly_proportions, message = FALSE, fig.width = 9, fig.height = 6}
-# number of diamonds by cut and clarity (n)
+## number of diamonds by cut and clarity (n)
 lotr_count <- count(lotr, Race, Film)
-# number of diamonds by cut (nn)
-lotr_prop <- left_join(lotr_count, count(lotr_count, Race, wt = n))
+## number of diamonds by cut (nn)
+lotr_prop <- left_join(lotr_count, count(lotr_count, Race, wt = n), 
+                       by = 'Race')
+
 lotr_prop %>%
-  mutate(prop = n / nn) %>%
-  plot_ly(x = ~Race, y = ~prop, color = ~Film) %>%
+  mutate(prop = n.x / n.y) %>%
+  plot_ly(x = ~Race, y = ~prop, color = ~Film, width = 900) %>%
   add_bars() %>%
   layout(barmode = "stack")
 ```
@@ -177,7 +179,7 @@ hc
 # Change Colors
 ```{r hc_change_colors, fig.width = 9, fig.height = 6}
 hc <- hc %>%
-  hc_colors(substr(viridis(3), 0, 7))
+  hc_colors(substr(viridis::viridis(3), 0, 7))
 hc
 ```
 
