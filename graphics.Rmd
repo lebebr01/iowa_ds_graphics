@@ -1,7 +1,7 @@
 ---
 title: "Data Visualization - Static and Interactive Graphics using R"
 author: "Brandon LeBeau"
-date: "February 21, 2019"
+date: "June 12, 2019"
 output:
   revealjs::revealjs_presentation:
     theme: simple
@@ -652,10 +652,50 @@ storms %>%
              radius = ~wind*1000)
 ```
 
+
+## gganimate
+```{r gganimate, eval = FALSE}
+install.packages("gganimate")
+```
+
+## gganimate example
+```{r gganimate-example, eval = FALSE}
+library(gganimate)
+
+ggplot(storms, aes(x = pressure, y = wind, color = status)) + 
+  geom_point(show.legend = FALSE) + 
+  xlab("Pressure") + 
+  ylab("Wind Speed (MPH)") +
+  facet_wrap(~status) +
+  theme_bw(base_size = 14) +
+  labs(title = 'Year: {frame_time}') +
+  transition_time(as.integer(year)) + 
+  ease_aes('linear')
+```
+
+## gganimate output
+```{r gganimate-example-out, echo = FALSE}
+library(gganimate)
+
+ggplot(storms, aes(x = pressure, y = wind, color = status)) + 
+  geom_point(show.legend = FALSE) + 
+  xlab("Pressure") + 
+  ylab("Wind Speed (MPH)") +
+  facet_wrap(~status) +
+  theme_bw(base_size = 14) +
+  labs(title = 'Year: {frame_time}') +
+  transition_time(as.integer(year)) + 
+  ease_aes('linear')
+```
+
+
+
+
 ## Additional Resources
 * plotly for R book: <https://plotly-book.cpsievert.me/>
 * plotly: <https://plot.ly/>
 * highcharter: <http://jkunst.com/highcharter/index.html>
 * highcharts: <https://www.highcharts.com/>
 * htmlwidgets: <https://www.htmlwidgets.org/>
+* gganimate: <https://gganimate.com/>
 
